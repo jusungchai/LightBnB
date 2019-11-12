@@ -1,14 +1,7 @@
 const properties = require('./json/properties.json');
 const users = require('./json/users.json');
 
-const { Pool } = require('pg');
-
-const pool = new Pool({
-  user: 'vagrant',
-  password: '123',
-  host: 'localhost',
-  database: 'lightbnb'
-});
+const db = require('./db');
 
 /// Users
 
@@ -22,7 +15,7 @@ const getUserWithEmail = function(email) {
     SELECT * FROM users
     WHERE email = $1;
   `; 
-  return pool.query(query, [email])
+  return db.query(query, [email])
   .then(res => {
     if (res.rows) {
       return res.rows[0];
@@ -43,7 +36,7 @@ const getUserWithId = function(id) {
     SELECT * FROM users
     WHERE id = $1;
   `; 
-  return pool.query(query, [id])
+  return db.query(query, [id])
   .then(res => {
     if (res.rows) {
       return res.rows[0];
@@ -67,7 +60,7 @@ const addUser =  function(user) {
     RETURNING *;
   `;
   const userInfo = [user.name, user.email, user.password];
-  return pool.query(query, userInfo)
+  return db.query(query, userInfo)
   .then(res => {
     if (res.rows) {
       return res.rows[0];
@@ -97,7 +90,7 @@ const getAllReservations = function(guest_id, limit = 10) {
     LIMIT $2;
   `;
   const values = [guest_id, limit];
-  return pool.query(query, values)
+  return db.query(query, values)
   .then (res => {
     if (res.rows) {
       return res.rows;
@@ -163,7 +156,7 @@ const getAllProperties = function(options, limit = 10) {
 
   queryParams.push(limit);  
   queryString += `LIMIT $${queryParams.length};`;
-  return pool.query(queryString, queryParams)
+  return db.query(queryString, queryParams)
   .then(res => res.rows);
 }
 exports.getAllProperties = getAllProperties;
@@ -181,7 +174,7 @@ const addProperty = function(property) {
     RETURNING *;
   `;
   const propertyValues = [property.owner_id, property.title, property.description, property.thumbnail_photo_url, property.cover_photo_url, property.cost_per_night, property.street, property.city, property.province, property.post_code, property.country, property.parking_spaces, property.number_of_bathrooms, property.number_of_bedrooms];
-  return pool.query(queryString, propertyValues)
+  return db.query(queryString, propertyValues)
   .then(res => {
     if (res.rows) {
       return res.rows[0];
