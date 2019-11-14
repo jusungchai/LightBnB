@@ -83,7 +83,7 @@ const getAllReservations = function(guest_id, limit = 10) {
     SELECT properties.*, reservations.*, AVG(property_reviews.rating) as average_rating
       FROM properties
       JOIN reservations ON properties.id = reservations.property_id
-      JOIN property_reviews ON properties.id = property_reviews.property_id  
+      LEFT OUTER JOIN property_reviews ON properties.id = property_reviews.property_id  
       WHERE end_date < now()::date AND reservations.guest_id = $1
       GROUP BY properties.id, reservations.id
       ORDER BY start_date
@@ -183,3 +183,22 @@ const addProperty = function(property) {
   });
 }
 exports.addProperty = addProperty;
+
+const propertyReservation = function(start_date, end_date, property_id, guest_id) {
+  console.log("received: ", start_date, end_date, property_id, guest_id);
+  const values = [start_date, end_date, property_id, guest_id];
+  const queryString = `
+    INSERT INTO reservations (start_date, end_date, property_id, guest_id)
+    VALUES ($1, $2, $3, $4)
+    RETURNING *;
+  `;
+  return db.query(queryString, values)
+  .then(res => {
+    if (res.rows) {
+      return res.rows[0];
+    } else {
+      return null;
+    }
+  });
+}
+exports.propertyReservation = propertyReservation;

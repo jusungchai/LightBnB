@@ -34,5 +34,15 @@ app.get("/test", (req, res) => {
   res.send("🤗");
 });
 
+app.post('/propertyReservation', (req, res) => {
+  //console.log(req.body);
+  //console.log(req.session);
+  
+  database.propertyReservation(req.body.start_date, req.body.end_date, req.body.property_id, req.session.userId)
+  .then(property => {
+    res.send(property);
+  })
+});
+
 const port = process.env.PORT || 3000; 
 app.listen(port, (err) => console.log(err || `listening on port ${port} 😎`));

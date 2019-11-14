@@ -1,15 +1,16 @@
 $(() => {
-
+  let i = 0;
   const $main = $('#main-content');
 
   window.views_manager = {};
 
-  window.views_manager.show = function(item) {
+  window.views_manager.show = function(item, propertyId) {
     $newPropertyForm.detach();
     $propertyListings.detach();
     $searchPropertyForm.detach();
     $logInForm.detach();
     $signUpForm.detach();
+    $reservationForm.detach();
 
     switch (item) {
       case 'listings':
@@ -27,6 +28,11 @@ $(() => {
       case 'signUp':
         $signUpForm.appendTo($main);
         break;
+      case 'reservationForm':
+        $reservationForm.propertyId = propertyId;
+        //console.log($reservationForm.propertyId)
+        $reservationForm.appendTo($main);
+        break;  
       case 'error': {
         const $error = $(`<p>${arguments[1]}</p>`);
         $error.appendTo('body');
